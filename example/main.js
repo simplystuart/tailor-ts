@@ -1,9 +1,9 @@
-import * as Threaded from "./dist/threaded.js";
+import { Tailor } from "./dist/index.js";
 
-const backgroundJob = new Threaded.BackgroundJob();
+const tailor = new Tailor(5);
 
-const { id, result } = backgroundJob.enqueue("add", [5, 5]);
+const { id, result } = tailor.schedule("add", { args: [5, 5] });
 
 console.log({ id, result });
 
-result.then(console.log);
+result.then((result) => console.log({ result }));

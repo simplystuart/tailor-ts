@@ -13,7 +13,8 @@ declare type Job = {
   status: JobStatus;
 }
 
-declare type JobStatus = EnqueuedStatus | RunningStatus | CompletedStatus | FailedStatus;
+declare type JobStatus =
+  EnqueuedStatus | RunningStatus | CompletedStatus | FailedStatus;
 
 declare type EnqueuedStatus = {
   kind: "enqueued",
@@ -32,4 +33,11 @@ declare type CompletedStatus = {
 declare type FailedStatus = {
   kind: "failed",
   error: string
+}
+
+declare type Resolver<T> = (value: T | PromiseLike<T>) => void;
+
+declare interface ThreadInterface {
+  id: number;
+  runJob: (job: Job) => Promise<Job>;
 }
