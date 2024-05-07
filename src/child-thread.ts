@@ -3,7 +3,7 @@ class ChildThread implements ThreadInterface {
 
   private current?: { job: Job, resolver: Resolver<Job> };
 
-  constructor(public id: number) {
+  constructor(public id: number, private functionsUrl: string) {
     const workerUrl = URL.createObjectURL(
       new Blob([this.workerJs()], { type: "application/javascript" })
     );
@@ -33,6 +33,12 @@ class ChildThread implements ThreadInterface {
   }
 
   runJob(enqueuedJob: Job): Promise<Job> {
+    const { id } = enqueuedJob;
+    const status = enqueuedJob.status.kind;
+
+    if (status !== "enqueued")
+      Promise.reject(`Job '${id}' is '${status}' and not enqueued`);
+
     const job = {
       ...enqueuedJob,
       status: { kind: "running", threadId: this.id } as RunningStatus
@@ -59,9 +65,8 @@ class ChildThread implements ThreadInterface {
   }
 
   private workerJs(): string {
-    // TODO: dynamic import
     return `
-      import * as Functions from "./functions.js";
+      import * as Functions from "${this.functionsUrl}";
       self.onmessage = ({ data }) => {
         const { job } = data;
         const fn = Functions.functions[job.fn];

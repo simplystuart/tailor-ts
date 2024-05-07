@@ -1,4 +1,3 @@
-import * as Functions from "./functions.js"; // TODO: dynamic import
 import * as Queue from "./queue.js";
 import * as ChildThread from "./child-thread.js";
 
@@ -7,21 +6,25 @@ class ParentThread implements ThreadInterface {
   private resolvers: Map<number, Resolver<Job>>;
   private threads: ThreadInterface[] = [];
 
-  constructor(public id: number, public maxThreads: number = 1) {
+  constructor(public id: number, private options: SchedulerOptions) {
     this.resolvers = new Map<number, Resolver<Job>>();
   }
 
   runJob(enqueuedJob: Job): Promise<Job> {
+    const { id } = enqueuedJob;
+    const status = enqueuedJob.status.kind;
+
+    if (status !== "enqueued")
+      Promise.reject(`Job '${id}' is '${status}' and not enqueued`);
+
     const job = {
       ...enqueuedJob, status: { kind: "running", threadId: this.id }
     };
 
-    const result = new Promise((resolve) => {
-      const value = Functions.functions[job.fn].apply(null, job.args);
-      resolve({ ...job, status: { kind: "completed", value } });
-    }) as Promise<Job>;
-
-    return result;
+    return import(this.options.functionsUrl)
+      .then((module) => module.functions[job.fn].apply(null, job.args))
+      .then((value) =>
+        ({ ...job, status: { kind: "completed", value } })) as Promise<Job>;
   }
 
   scheduleJob(job: Job): Promise<Job> {
@@ -29,7 +32,7 @@ class ParentThread implements ThreadInterface {
       this.resolvers.set(job.id, resolve);
     }) as Promise<Job>;
 
-    this.queue.insert(job);
+    this.queue.insert({ ...job, status: { kind: "enqueued" } });
 
     if (this.queue.length === 1) this.processQueue();
 
@@ -38,7 +41,7 @@ class ParentThread implements ThreadInterface {
 
   private async processQueue() {
     while (this.queue.length > 0) {
-      for (let i = 0; i < this.maxThreads; ++i) {
+      for (let i = 0; i < this.options.maxThreads; ++i) {
         if (this.queue.length === 0) break;
         if (i < this.threads.length) continue;
 
@@ -47,7 +50,9 @@ class ParentThread implements ThreadInterface {
         if (i === 0) {
           this.threads.push(this);
         } else {
-          this.threads.push(new ChildThread.ChildThread(i + 1));
+          this.threads.push(
+            new ChildThread.ChildThread(i + 1, this.options.functionsUrl)
+          );
         }
 
         this.threads[i].runJob(job).then((job: Job) => {

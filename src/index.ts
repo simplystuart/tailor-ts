@@ -1,11 +1,25 @@
+export type Config = {
+  functionsUrl?: string | URL;
+  maxThreads?: number;
+}
+
 class Tailor {
   private jobId: number = 0;
   private jobResolvers: Map<number, Resolver<Job>>;
+  private options: SchedulerOptions;
 
   private scheduler?: Worker;
 
-  constructor(private maxThreads: number = 1) {
+  constructor(config?: Config) {
+    // TODO: url error checking... must be absolute
+    const functionsUrl: string =
+      config?.functionsUrl && config?.functionsUrl instanceof URL
+        ? config?.functionsUrl?.toString()
+        : config?.functionsUrl
+          ? config?.functionsUrl as string : "/functions.js";
+
     this.jobResolvers = new Map<number, Resolver<Job>>();
+    this.options = { functionsUrl, maxThreads: config?.maxThreads || 1 };
   }
 
   schedule(
@@ -21,7 +35,7 @@ class Tailor {
 
     this.scheduler?.postMessage({
       job: { id: this.jobId, fn, args, priority, status: { kind: "enqueued" } },
-      maxThreads: this.maxThreads
+      options: this.options,
     });
 
     return { id: this.jobId, result };

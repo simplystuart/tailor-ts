@@ -37,6 +37,11 @@ declare type FailedStatus = {
 
 declare type Resolver<T> = (value: T | PromiseLike<T>) => void;
 
+declare type SchedulerOptions = {
+  functionsUrl: string;
+  maxThreads: number;
+}
+
 declare interface ThreadInterface {
   id: number;
   runJob: (job: Job) => Promise<Job>;
