@@ -1,5 +1,5 @@
-import * as Queue from "./queue.js";
-import * as ChildThread from "./child-thread.js";
+import * as Queue from "./queue";
+import * as ChildThread from "./child-thread";
 
 class ParentThread implements ThreadInterface {
   private queue: Queue.Queue<Job> = new Queue.Queue();
@@ -15,7 +15,7 @@ class ParentThread implements ThreadInterface {
     const status = enqueuedJob.status.kind;
 
     if (status !== "enqueued")
-      Promise.reject(`Job '${id}' is '${status}' and not enqueued`);
+      return Promise.reject(`Job '${id}' is '${status}' and not enqueued`);
 
     const job = {
       ...enqueuedJob, status: { kind: "running", threadId: this.id }

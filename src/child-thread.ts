@@ -37,7 +37,7 @@ class ChildThread implements ThreadInterface {
     const status = enqueuedJob.status.kind;
 
     if (status !== "enqueued")
-      Promise.reject(`Job '${id}' is '${status}' and not enqueued`);
+      return Promise.reject(`Job '${id}' is '${status}' and not enqueued`);
 
     const job = {
       ...enqueuedJob,

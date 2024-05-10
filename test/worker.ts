@@ -4,7 +4,10 @@ class Worker {
 
   // Instance methods
   public postMessage(_message: any): void;
-  public postMessage(_message: any, _options?: Transferable | { transfer: Transferable[] }): void { };
+  public postMessage(message: any, _options?: Transferable | { transfer: Transferable[] }): void {
+    this.onmessage(new MessageEvent("message", { data: message }));
+  };
+
   public terminate(): void { }
 
   // Events

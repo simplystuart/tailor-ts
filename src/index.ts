@@ -16,7 +16,7 @@ class Tailor {
       config?.functionsUrl && config?.functionsUrl instanceof URL
         ? config?.functionsUrl?.toString()
         : config?.functionsUrl
-          ? config?.functionsUrl as string : "/functions.js";
+          ? config?.functionsUrl as string : "./functions";
 
     this.jobResolvers = new Map<number, Resolver<Job>>();
     this.options = { functionsUrl, maxThreads: config?.maxThreads || 1 };
@@ -42,7 +42,7 @@ class Tailor {
   }
 
   private setupScheduler(): void {
-    this.scheduler = new Worker("dist/scheduler.js", {
+    this.scheduler = new Worker("./scheduler", {
       name: "scheduler", type: "module"
     });
 
