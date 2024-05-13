@@ -1,5 +1,5 @@
-import * as Queue from "./queue";
-import * as ChildThread from "./child-thread";
+import * as Queue from "./queue.js";
+import * as ChildThread from "./child-thread.js";
 
 class ParentThread implements ThreadInterface {
   private queue: Queue.Queue<Job> = new Queue.Queue();
@@ -25,10 +25,16 @@ class ParentThread implements ThreadInterface {
       .then((module) => module.functions[job.fn].apply(null, job.args))
       .then((value) =>
         ({ ...job, status: { kind: "completed", value } }))
-      .catch((_err) =>
-        `Failed to execute "${job.fn}" ` +
-        `at "${this.options.functionsUrl}" ` +
-        `with (${job.args.join(", ")})`
+      .catch((err) =>
+        Promise.resolve({
+          ...job, status: {
+            kind: "failed", error:
+              `Failed to execute function '${job.fn}' ` +
+              `at file '${this.options.functionsUrl}' ` +
+              `with arguments (${job.args.join(', ')}) ` +
+              `due to error '${err}'`
+          }
+        })
       ) as Promise<Job>;
   }
 

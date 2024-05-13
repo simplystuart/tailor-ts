@@ -41,7 +41,8 @@ class Tailor {
   }
 
   private setupScheduler(): void {
-    this.scheduler = new Worker("./scheduler", {
+    // TODO: is there a better way to do this?
+    this.scheduler = new Worker("/dist/scheduler.js", {
       name: "scheduler", type: "module"
     });
 

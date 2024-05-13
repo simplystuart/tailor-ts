@@ -1,4 +1,4 @@
-import * as ParentThread from "./parent-thread";
+import * as ParentThread from "./parent-thread.js";
 
 let scheduler: ParentThread.ParentThread | undefined;
 
