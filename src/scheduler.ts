@@ -1,9 +1,9 @@
-import * as ParentThread from "./parent-thread.js";
+import * as ParentThread from "./parent-thread";
 
 let scheduler: ParentThread.ParentThread | undefined;
 
 self.onmessage = ({ data }) => {
-  if (!scheduler) scheduler = new ParentThread.ParentThread(1, data.maxThreads);
+  if (!scheduler) scheduler = new ParentThread.ParentThread(1, data.options);
   scheduler.scheduleJob(data.job).then((job) => self.postMessage({ job }));
 };
 
