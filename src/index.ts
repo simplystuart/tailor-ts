@@ -11,7 +11,6 @@ class Tailor {
   private scheduler?: Worker;
 
   constructor(config?: Config) {
-    // TODO: url error checking... must be absolute
     const functionsUrl: string =
       config?.functionsUrl && config?.functionsUrl instanceof URL
         ? config?.functionsUrl?.toString()

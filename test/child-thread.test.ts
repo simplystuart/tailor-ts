@@ -11,7 +11,6 @@ describe("ChildThread", () => {
     expect(childThread.id).toBe(1)
   );
 
-  // TODO: run tests through functions.js?
   it("should run an enqueued job", () => {
     const job = {
       id: 1, fn: "add", args: [1, 2], status: { kind: "enqueued" }
