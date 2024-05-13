@@ -24,7 +24,12 @@ class ParentThread implements ThreadInterface {
     return import(this.options.functionsUrl)
       .then((module) => module.functions[job.fn].apply(null, job.args))
       .then((value) =>
-        ({ ...job, status: { kind: "completed", value } })) as Promise<Job>;
+        ({ ...job, status: { kind: "completed", value } }))
+      .catch((_err) =>
+        `Failed to execute "${job.fn}" ` +
+        `at "${this.options.functionsUrl}" ` +
+        `with (${job.args.join(", ")})`
+      ) as Promise<Job>;
   }
 
   scheduleJob(job: Job): Promise<Job> {
