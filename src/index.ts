@@ -42,6 +42,9 @@ class Tailor {
 
   private setupScheduler(): void {
     // TODO: is there a better way to do this?
+    // this has to be a url path, so we have to know where it's called from
+    // or we generate it.
+    // solution: inject text via a build step
     this.scheduler = new Worker("/dist/scheduler.js", {
       name: "scheduler", type: "module"
     });
