@@ -1,4 +1,4 @@
-import(env.FUNCTIONS_URL).then((module) => {
+import(FUNCTIONS_URL).then((module) => {
   self.onmessage = ({ data }) => {
     const { job } = data;
     const fn = module.functions[job.fn];
@@ -7,4 +7,4 @@ import(env.FUNCTIONS_URL).then((module) => {
   };
   self.onmessageerror = (error: MessageEvent) =>
     console.error({ error, thread: self.name });
-}).catch((_err: Error) => console.error(`Failed to load '${env.FUNCTIONS_URL}`));
+}).catch((_err: Error) => console.error(`Failed to load '${FUNCTIONS_URL}`));
